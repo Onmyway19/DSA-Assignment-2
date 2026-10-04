@@ -1,0 +1,4 @@
+kafkaBootstrap = "kafka:9092"
+mongoHost = "order-mongo"
+mongoPort = 27017
+mongoDb = "orders_db"
