@@ -105,3 +105,23 @@ Design notes: optimistic locking via `version` field (handles concurrent updates
 - No shared database between services
 - Dockerfile + service added to docker-compose, env via Config.toml
 - Every member has commits in the repo (marks are 0 otherwise)
+
+## 9. Notification and admin consumers
+
+The Notification Service uses consumer group `notification-service` for order,
+payment, delivery, and `notifications.requests` events. It produces EMAIL, SMS,
+and PUSH deliveries for each recipient present in an event; request events
+specify a single recipient and channel. Channel adapter URLs are configured
+with `EMAIL_WEBHOOK`, `SMS_WEBHOOK`, and `PUSH_WEBHOOK`. Each webhook receives
+JSON containing `deliveryId`, `eventId`, `orderId`, `recipientType`,
+`recipientId`, `channel`, and `message` and must return a 2xx response.
+Adapters can use `deliveryId` as an idempotency key. If no URL is configured, the
+service records and logs a `SIMULATED` delivery rather than sending externally.
+
+The Admin Service uses consumer group `admin-service` to store order creation,
+order status, and delivery assignment/completion events in its own database.
+Its API exposes `GET /admin/reports/restaurants/{restaurantId}` and
+`GET /admin/reports/delivery-performance` on port 8085. Both accept optional
+`startAt` and `endAt` UTC timestamps in ISO-8601 format ending in `Z`.
+The delivery report's on-time rate is based only on completed deliveries with
+an ETA in the corresponding assignment event.

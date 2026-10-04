@@ -40,8 +40,35 @@ services:
     ports: ["8081:8081", "8091:8091"]
     restart: on-failure
 
-  # Teammates: add customer-service, restaurant-service, payment-service,
-  # delivery-service, notification-service, admin-service below, each with its own DB.
+  notification-mongo:
+    image: mongo:7
+    volumes: ["notification-mongo-data:/data/db"]
+
+  notification-service:
+    build: ./notification-service
+    depends_on:
+      kafka-init: { condition: service_completed_successfully }
+      notification-mongo: { condition: service_started }
+    environment:
+      BAL_CONFIG_VAR_emailWebhook: ${EMAIL_WEBHOOK:-}
+      BAL_CONFIG_VAR_smsWebhook: ${SMS_WEBHOOK:-}
+      BAL_CONFIG_VAR_pushWebhook: ${PUSH_WEBHOOK:-}
+    ports: ["8092:8092"]
+    restart: on-failure
+
+  admin-mongo:
+    image: mongo:7
+    volumes: ["admin-mongo-data:/data/db"]
+
+  admin-service:
+    build: ./admin-service
+    depends_on:
+      kafka-init: { condition: service_completed_successfully }
+      admin-mongo: { condition: service_started }
+    ports: ["8085:8085", "8095:8095"]
+    restart: on-failure
 
 volumes:
   order-mongo-data:
+  notification-mongo-data:
+  admin-mongo-data:
