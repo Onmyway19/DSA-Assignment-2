@@ -1,0 +1,38 @@
+{
+  "info": { "name": "Order Service", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "variable": [ { "key": "baseUrl", "value": "http://localhost:8081" }, { "key": "orderId", "value": "" } ],
+  "item": [
+    { "name": "1. Create order",
+      "event": [ { "listen": "test", "script": { "exec": [
+        "pm.test('201 Created', () => pm.response.to.have.status(201));",
+        "pm.collectionVariables.set('orderId', pm.response.json().id);",
+        "pm.test('status is CREATED', () => pm.expect(pm.response.json().status).to.eql('CREATED'));" ] } } ],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/orders",
+        "body": { "mode": "raw", "raw": "{\n  \"customerId\": \"c1\",\n  \"restaurantId\": \"r1\",\n  \"deliveryAddress\": \"12 Independence Ave\",\n  \"items\": [ { \"menuItemId\": \"m1\", \"name\": \"Burger\", \"quantity\": 2, \"unitPrice\": 45.0 } ]\n}" } } },
+    { "name": "2. Get order", "request": { "method": "GET", "url": "{{baseUrl}}/orders/{{orderId}}" } },
+    { "name": "3. List orders (by customer)", "request": { "method": "GET", "url": "{{baseUrl}}/orders?customerId=c1" } },
+    { "name": "4. Confirm (as PAYMENT)",
+      "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/orders/{{orderId}}/status", "body": { "mode": "raw", "raw": "{ \"status\": \"CONFIRMED\", \"actor\": \"PAYMENT\" }" } } },
+    { "name": "5. Preparing (as RESTAURANT)",
+      "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/orders/{{orderId}}/status", "body": { "mode": "raw", "raw": "{ \"status\": \"PREPARING\", \"actor\": \"RESTAURANT\" }" } } },
+    { "name": "6. Ready (as RESTAURANT)",
+      "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/orders/{{orderId}}/status", "body": { "mode": "raw", "raw": "{ \"status\": \"READY\", \"actor\": \"RESTAURANT\" }" } } },
+    { "name": "7. Out for delivery (as DELIVERY)",
+      "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/orders/{{orderId}}/status", "body": { "mode": "raw", "raw": "{ \"status\": \"OUT_FOR_DELIVERY\", \"actor\": \"DELIVERY\" }" } } },
+    { "name": "8. Delivered (as DELIVERY)",
+      "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/orders/{{orderId}}/status", "body": { "mode": "raw", "raw": "{ \"status\": \"DELIVERED\", \"actor\": \"DELIVERY\" }" } } },
+    { "name": "9. Cancel order (expect 409 after DELIVERED)",
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/orders/{{orderId}}/cancel", "body": { "mode": "raw", "raw": "{ \"actor\": \"CUSTOMER\", \"reason\": \"changed my mind\" }" } } },
+    { "name": "10. Illegal jump CREATED->DELIVERED (expect 409)",
+      "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/orders/{{orderId}}/status", "body": { "mode": "raw", "raw": "{ \"status\": \"DELIVERED\", \"actor\": \"ADMIN\" }" } } },
+    { "name": "Health", "request": { "method": "GET", "url": "http://localhost:8091/health" } }
+  ]
+}

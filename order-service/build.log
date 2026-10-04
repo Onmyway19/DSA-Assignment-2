@@ -1,0 +1,14 @@
+Compiling source
+	fooddelivery/order_service:0.1.0
+WARNING [order_service] The following transitive dependencies were published with a distribution older than Swan Lake Update 12. It is recommended to execute 'bal build --locking-mode=soft' to ensure compatibility:
+	- ballerinax/confluent.cavroserdes:1.0.3
+	- ballerinax/confluent.cregistry:0.4.5
+HINT [consumers.bal:(14:5,14:5)] concurrent calls will not be made to this method since the method is not an 'isolated' method
+HINT [service.bal:(58:5,58:5)] concurrent calls will not be made to this method since the method is not an 'isolated' method
+HINT [service.bal:(83:5,83:5)] concurrent calls will not be made to this method since the method is not an 'isolated' method
+HINT [service.bal:(91:5,91:5)] concurrent calls will not be made to this method since the method is not an 'isolated' method
+HINT [service.bal:(96:5,96:5)] concurrent calls will not be made to this method since the method is not an 'isolated' method
+HINT [service.bal:(108:5,108:5)] concurrent calls will not be made to this method since the method is not an 'isolated' method
+
+Generating executable
+	target\bin\order_service.jar
