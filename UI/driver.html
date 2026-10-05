@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver Dispatch</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Customer</a>
+            <a href="restaurant.html">Restaurant</a>
+            <a href="driver.html" class="active">Driver</a>
+            <a href="admin.html">Admin</a>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="card">
+            <h1>Delivery Dispatch</h1>
+            <label>Order ID:</label>
+            <input type="text" id="delOrderId" placeholder="e.g. ORD-1001">
+            <label>Driver ID:</label>
+            <input type="text" id="driverId" value="DRV-505">
+            <button onclick="assignDriver()">Assign Driver & Dispatch</button>
+            <pre id="output">// Response will appear here...</pre>
+        </div>
+    </div>
+    <script>
+        async function assignDriver() {
+            const orderId = document.getElementById('delOrderId').value;
+            const driverId = document.getElementById('driverId').value;
+            try {
+                const res = await fetch('http://localhost:8083/delivery/assignments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: orderId, driverId: driverId })
+                });
+                const data = await res.json();
+                document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+            } catch (err) {
+                document.getElementById('output').innerText = "Error: " + err.message;
+            }
+        }
+    </script>
+</body>
+</html>

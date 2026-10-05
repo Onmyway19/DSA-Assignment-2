@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin System Summary</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Customer</a>
+            <a href="restaurant.html">Restaurant</a>
+            <a href="driver.html">Driver</a>
+            <a href="admin.html" class="active">Admin</a>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="card">
+            <h1>Admin Dashboard</h1>
+            <button onclick="fetchSummary()">Fetch System Overview</button>
+            <pre id="output">// Summary will appear here...</pre>
+        </div>
+    </div>
+    <script>
+        async function fetchSummary() {
+            try {
+                const res = await fetch('http://localhost:8085/admin/system/summary');
+                const data = await res.json();
+                document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+            } catch (err) {
+                document.getElementById('output').innerText = "Error: " + err.message;
+            }
+        }
+    </script>
+</body>
+</html>

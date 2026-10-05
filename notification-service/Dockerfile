@@ -1,6 +1,10 @@
+FROM ballerina/ballerina:2201.13.5 AS builder
+WORKDIR /home/ballerina
+COPY --chown=ballerina:ballerina . .
+RUN bal build
+
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY target/bin/notification_service.jar ./notification_service.jar
-COPY Config.toml ./Config.toml
-EXPOSE 8092
-ENTRYPOINT ["java", "-jar", "notification_service.jar"]
+COPY --from=builder /home/ballerina/target/bin/notification_service.jar .
+
+CMD ["java", "-jar", "notification_service.jar", "--bal.config.hasunbound=false"]
