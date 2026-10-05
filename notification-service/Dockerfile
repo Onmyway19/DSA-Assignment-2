@@ -1,6 +1,5 @@
-FROM eclipse-temurin:21-jre
+FROM ballerina/ballerina:2201.13.0
 WORKDIR /app
-COPY target/bin/notification_service.jar ./notification_service.jar
-COPY Config.toml ./Config.toml
-EXPOSE 8092
-ENTRYPOINT ["java", "-jar", "notification_service.jar"]
+COPY . .
+EXPOSE 8092 8096
+ENTRYPOINT ["bal", "run"]

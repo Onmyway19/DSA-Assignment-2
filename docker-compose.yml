@@ -93,31 +93,32 @@ services:
       admin-mongo: { condition: service_started }
     ports: ["8085:8085", "8095:8095"]
     restart: on-failure
-customer-mongo:
-image: mongo:7
-volumes: ["customer-mongo-data:/data/db"]
-ports: ["27020:27017"]
 
-customer-service:
-build: ./customer_service
-depends_on:
-kafka-init: { condition: service_completed_successfully }
-customer-mongo: { condition: service_started }
-ports"["8084:8081"]
-restart: on-failure
+  customer-mongo:
+    image: mongo:7
+    volumes: ["customer-mongo-data:/data/db"]
+    ports: ["27020:27017"]
 
-restaurant-mongo:
-image: mongo:7
-volumes: ["restaurant-mongo-data:/data/db"]
-ports: ["27021:27017"]
+  customer-service:
+    build: ./customer_service
+    depends_on:
+      kafka-init: { condition: service_completed_successfully }
+      customer-mongo: { condition: service_started }
+    ports: ["8084:8081"]
+    restart: on-failure
 
-restaurant-service:
-build: ./restaurant_service
-depends_on:
-kafka-init: { condition: service_completed_successfully }
-restaurant-mongo: { condition: service_started }
-ports: ["8086:8082"]
-restart: on-failure
+  restaurant-mongo:
+    image: mongo:7
+    volumes: ["restaurant-mongo-data:/data/db"]
+    ports: ["27021:27017"]
+
+  restaurant-service:
+    build: ./restaurant_service
+    depends_on:
+      kafka-init: { condition: service_completed_successfully }
+      restaurant-mongo: { condition: service_started }
+    ports: ["8086:8082"]
+    restart: on-failure
 
 volumes:
   order-mongo-data:

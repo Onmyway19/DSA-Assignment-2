@@ -1,6 +1,5 @@
-FROM eclipse-temurin:21-jre
+FROM ballerina/ballerina:2201.13.0
 WORKDIR /app
-COPY target/bin/payment_service.jar ./payment_service.jar
-COPY Config.toml ./Config.toml
+COPY . .
 EXPOSE 8082 8092
-ENTRYPOINT ["java", "-jar", "payment_service.jar"]
+ENTRYPOINT ["bal", "run"]

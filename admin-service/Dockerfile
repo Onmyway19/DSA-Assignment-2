@@ -1,6 +1,5 @@
-FROM eclipse-temurin:21-jre
+FROM ballerina/ballerina:2201.13.0
 WORKDIR /app
-COPY target/bin/admin_service.jar ./admin_service.jar
-COPY Config.toml ./Config.toml
+COPY . .
 EXPOSE 8085 8095
-ENTRYPOINT ["java", "-jar", "admin_service.jar"]
+ENTRYPOINT ["bal", "run"]
