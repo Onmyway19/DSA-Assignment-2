@@ -40,8 +40,36 @@ services:
     ports: ["8081:8081", "8091:8091"]
     restart: on-failure
 
-  # Teammates: add customer-service, restaurant-service, payment-service,
-  # delivery-service, notification-service, admin-service below, each with its own DB.
+  payment-mongo:
+    image: mongo:7
+    volumes: ["payment-mongo-data:/data/db"]
+    ports: ["27018:27017"]
+
+  payment-service:
+    build: ./payment-service
+    depends_on:
+      kafka-init: { condition: service_completed_successfully }
+      payment-mongo: { condition: service_started }
+    ports: ["8082:8082", "8092:8092"]
+    restart: on-failure
+
+  delivery-mongo:
+    image: mongo:7
+    volumes: ["delivery-mongo-data:/data/db"]
+    ports: ["27019:27017"]
+
+  delivery-service:
+    build: ./delivery-service
+    depends_on:
+      kafka-init: { condition: service_completed_successfully }
+      delivery-mongo: { condition: service_started }
+    ports: ["8083:8083", "8093:8093"]
+    restart: on-failure
+
+  # Teammates: add customer-service, restaurant-service, notification-service,
+  # admin-service below, each with its own DB.
 
 volumes:
   order-mongo-data:
+  payment-mongo-data:
+  delivery-mongo-data:
