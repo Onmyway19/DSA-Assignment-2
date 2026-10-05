@@ -6,6 +6,5 @@ RUN bal build
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=builder /home/ballerina/target/bin/customer_service.jar .
-COPY Config.toml .
 
 CMD ["java", "-jar", "customer_service.jar"]

@@ -96,7 +96,7 @@ services:
     ports: ["8085:8085", "8095:8095"]
     restart: on-failure
 
-   customer-mongo:
+  customer-mongo:
     image: mongo:7
     volumes: ["customer-mongo-data:/data/db"]
     ports: ["27020:27017"]
@@ -110,7 +110,7 @@ services:
     ports: ["8084:8084"]
     restart: on-failure
 
-    restaurant-mongo:
+  restaurant-mongo:
     image: mongo:7
     volumes: ["restaurant-mongo-data:/data/db"]
     ports: ["27021:27017"]
