@@ -1,0 +1,6 @@
+kafkaBootstrap = "kafka:9092"
+mongoHost = "delivery-mongo"
+mongoPort = 27017
+mongoDb = "delivery_db"
+drivers = ["d1", "d2", "d3"]
+etaMinutes = 25
