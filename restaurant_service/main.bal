@@ -2,9 +2,9 @@ import ballerina/http;
 import ballerinax/mongodb;
 import ballerina/time;
 
-configurable string dbUrl = "mongodb://localhost:27017";
+configurable int restaurantPort = 8086;
 
-service /restaurants on new http:Listener(8082) {
+service /restaurants on new http:Listener(restaurantPort) {
 
     resource function post .(@http:Payload Restaurant payload) returns http:Created|http:InternalServerError {
         do {
@@ -157,6 +157,30 @@ service /restaurants on new http:Listener(8082) {
             return <http:InternalServerError>{
                 body: {message: "Failed to check restaurant status: " + e.message()}
             };
+        }
+    }
+
+    resource function post [string id]/orders/[string orderId]/status(@http:Payload OrderStatusUpdate update)
+            returns http:Accepted|http:BadRequest|http:NotFound|http:InternalServerError {
+        if ALLOWED_STATUSES.indexOf(update.status) is () {
+            return <http:BadRequest>{body: {message: "status must be one of PREPARING, READY, REJECTED"}};
+        }
+        do {
+            mongodb:Database db = check getDatabase();
+            mongodb:Collection restaurantsCol = check db->getCollection("restaurants");
+
+            map<json> filter = {"_id": id};
+            stream<Restaurant, error?> restStream = check restaurantsCol->find(filter);
+            record {| Restaurant value; |}? result = check restStream.next();
+            check restStream.close();
+            if result is () {
+                return <http:NotFound>{body: {message: "Restaurant not found"}};
+            }
+
+            check publishOrderStatus(id, orderId, update.status, update?.reason);
+            return <http:Accepted>{body: {message: "Order status published", orderId: orderId, status: update.status}};
+        } on fail var e {
+            return <http:InternalServerError>{body: {message: "Failed to publish order status: " + e.message()}};
         }
     }
 }
