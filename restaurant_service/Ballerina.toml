@@ -2,7 +2,7 @@
 org = "food_platform"
 name = "restaurant_service"
 version = "0.1.0"
-distribution = "2201.8.0"
+distribution = "2201.13.5"
 
 [build-options]
 observabilityIncluded = true

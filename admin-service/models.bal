@@ -52,11 +52,11 @@ function isWithinRange(string occurredAt, string? startAt, string? endAt) return
 }
 
 function elapsedMinutes(string startAt, string endAt) returns float|error {
-    time:Utc start = check time:utcFromString(startAt);
-    time:Utc end = check time:utcFromString(endAt);
-    time:Seconds seconds = time:utcDiffSeconds(end, start);
-    if seconds < 0.0 {
+    time:Utc startTime = check time:utcFromString(startAt);
+    time:Utc endTime = check time:utcFromString(endAt);
+    time:Seconds seconds = time:utcDiffSeconds(endTime, startTime);
+    if seconds < 0d {
         return error("Event timestamp precedes its starting timestamp");
     }
-    return seconds.toFloat() / 60.0;
+    return <float>seconds / 60.0;
 }

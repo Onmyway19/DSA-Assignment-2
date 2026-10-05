@@ -17,7 +17,7 @@ service /admin on new http:Listener(8085) {
         return report;
     }
 
-    resource function get reports/delivery-performance(string? startAt, string? endAt)
+    resource function get reports/delivery\-performance(string? startAt, string? endAt)
             returns json|BadReportRange|ReportFailure {
         error? rangeError = validateRange(startAt, endAt);
         if rangeError is error {

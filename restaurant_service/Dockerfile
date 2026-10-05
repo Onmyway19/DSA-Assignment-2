@@ -1,5 +1,10 @@
-FROM ballerina/ballerina:2201.13.0
+FROM ballerina/ballerina:2201.13.5 AS builder
+WORKDIR /home/ballerina
+COPY --chown=ballerina:ballerina . .
+RUN bal build
+
+FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY . .
-EXPOSE 8082
-CMD ["bal", "run"]
+COPY --from=builder /home/ballerina/target/bin/restaurant_service.jar .
+
+CMD ["java", "-jar", "restaurant_service.jar", "--bal.config.hasunbound=false"]

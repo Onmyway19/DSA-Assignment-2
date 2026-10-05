@@ -4,3 +4,4 @@ Dependencies.toml
 .idea/
 .vscode/
 .DS_Store
+*.log

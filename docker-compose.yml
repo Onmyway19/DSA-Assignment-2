@@ -76,9 +76,11 @@ services:
       kafka-init: { condition: service_completed_successfully }
       notification-mongo: { condition: service_started }
     environment:
-      BAL_CONFIG_VAR_emailWebhook: ${EMAIL_WEBHOOK:-}
-      BAL_CONFIG_VAR_smsWebhook: ${SMS_WEBHOOK:-}
-      BAL_CONFIG_VAR_pushWebhook: ${PUSH_WEBHOOK:-}
+      BAL_CONFIG_VAR_EMAILWEBHOOK: ${EMAIL_WEBHOOK:-}
+      BAL_CONFIG_VAR_SMSWEBHOOK: ${SMS_WEBHOOK:-}
+      BAL_CONFIG_VAR_PUSHWEBHOOK: ${PUSH_WEBHOOK:-}
+      BAL_CONFIG_VAR_KAFKABOOTSTRAP: kafka:9092
+      BAL_CONFIG_VAR_MONGOURL: mongodb://notification-mongo:27017
     ports: ["8092:8092"]
     restart: on-failure
 
@@ -94,7 +96,7 @@ services:
     ports: ["8085:8085", "8095:8095"]
     restart: on-failure
 
-  customer-mongo:
+   customer-mongo:
     image: mongo:7
     volumes: ["customer-mongo-data:/data/db"]
     ports: ["27020:27017"]
@@ -102,12 +104,13 @@ services:
   customer-service:
     build: ./customer_service
     depends_on:
-      kafka-init: { condition: service_completed_successfully }
       customer-mongo: { condition: service_started }
-    ports: ["8084:8081"]
+    environment:
+      BAL_CONFIG_VAR_DBURL: mongodb://customer-mongo:27017
+    ports: ["8084:8084"]
     restart: on-failure
 
-  restaurant-mongo:
+    restaurant-mongo:
     image: mongo:7
     volumes: ["restaurant-mongo-data:/data/db"]
     ports: ["27021:27017"]
@@ -117,8 +120,20 @@ services:
     depends_on:
       kafka-init: { condition: service_completed_successfully }
       restaurant-mongo: { condition: service_started }
-    ports: ["8086:8082"]
+    environment:
+      BAL_CONFIG_VAR_DBURL: mongodb://restaurant-mongo:27017
+      BAL_CONFIG_VAR_KAFKABOOTSTRAP: kafka:9092
+    ports: ["8086:8086"]
     restart: on-failure
+
+  frontend:
+    image: nginx:alpine
+    container_name: food-delivery-ui
+    ports:
+      - "80:80"
+    volumes:
+      - ./ui:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
 
 volumes:
   order-mongo-data:

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin reports</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav><a href="index.html">Customer</a><a href="restaurant.html">Restaurant</a><a href="driver.html">Driver</a><a href="admin.html" aria-current>Admin</a></nav>
+<main>
+<h1>Reports</h1>
+<p class="hint">Built from the events the platform has recorded so far.</p>
+<form onsubmit="return false">
+<label>Restaurant ID<input id="restaurantId" value="r1"></label>
+<div class="actions"><button onclick="delivery()">Delivery performance</button><button class="alt" onclick="restaurant()">Restaurant report</button></div>
+</form>
+<pre id="out" aria-live="polite"></pre>
+</main>
+<script src="app.js"></script>
+<script>
+function delivery() { call('GET', '/api/admin/admin/reports/delivery-performance'); }
+function restaurant() { call('GET', '/api/admin/admin/reports/restaurants/' + enc('restaurantId')); }
+</script>
+</body>
+</html>

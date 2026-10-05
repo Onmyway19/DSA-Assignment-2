@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Driver</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav><a href="index.html">Customer</a><a href="restaurant.html">Restaurant</a><a href="driver.html" aria-current>Driver</a><a href="admin.html">Admin</a></nav>
+<main>
+<h1>Deliveries</h1>
+<p class="hint">Deliveries are assigned automatically once the restaurant marks an order ready.</p>
+<form onsubmit="return false">
+<div class="row"><label>Driver ID<input id="driverId" value="d1"></label><label>Order ID<input id="orderId"></label></div>
+<div class="actions"><button class="alt" onclick="list()">List my deliveries</button><button class="alt" onclick="one()">Check delivery</button><button onclick="act('pickup')">Pick up</button><button onclick="act('complete')">Mark delivered</button></div>
+</form>
+<pre id="out" aria-live="polite"></pre>
+</main>
+<script src="app.js"></script>
+<script>
+$('orderId').value = lastOrder();
+function list() { call('GET', '/api/delivery/deliveries?driverId=' + enc('driverId')); }
+function one() { call('GET', '/api/delivery/deliveries/' + enc('orderId')); }
+function act(step) { call('POST', '/api/delivery/deliveries/' + enc('orderId') + '/' + step); }
+</script>
+</body>
+</html>
