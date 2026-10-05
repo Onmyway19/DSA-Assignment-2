@@ -7,13 +7,17 @@ flowchart LR
   ORD <--> OM[(MongoDB orders_db)]
   ORD -- orders.created / orders.status-changed / orders.cancelled --> K{{Kafka}}
   K -- orders.created --> PAY[Payment Service]
-  K -- orders.status-changed --> NOT[Notification Service]
+  K -- orders.*, payments.*, delivery.* --> NOT[Notification Service]
   K -- orders.status-changed --> DEL[Delivery Service]
-  K -- orders.status-changed --> ADM[Admin Service]
+  K -- orders.created / orders.status-changed / delivery.* --> ADM[Admin Service]
   PAY -- payments.completed / payments.failed --> K
   REST[Restaurant Service] -- restaurant.order.status --> K
   DEL -- delivery.picked-up / delivery.completed --> K
   K -- payments.*, restaurant.order.status, delivery.* --> ORD
+  NOT --> NDB[(Notification MongoDB)]
+  NOT -->|EMAIL / SMS / PUSH webhooks| CHANNELS[Channel adapters]
+  ADM --> ADB[(Admin MongoDB)]
+  ADM -->|Restaurant and delivery reports| ADMIN[Admin API :8085]
 ```
 
 ## 2. Order state machine

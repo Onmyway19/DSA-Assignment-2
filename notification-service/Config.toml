@@ -1,0 +1,6 @@
+kafkaBootstrap = "kafka:9092"
+mongoUrl = "mongodb://notification-mongo:27017"
+mongoDb = "notification_db"
+emailWebhook = ""
+smsWebhook = ""
+pushWebhook = ""
