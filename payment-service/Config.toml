@@ -1,0 +1,6 @@
+kafkaBootstrap = "kafka:9092"
+mongoHost = "payment-mongo"
+mongoPort = 27017
+mongoDb = "payments_db"
+# Orders above this amount are declined (INSUFFICIENT_FUNDS) - makes the failure path easy to demo
+maxPaymentAmount = 1000.0
