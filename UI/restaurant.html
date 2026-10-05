@@ -1,50 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Restaurant Portal</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Restaurant</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="index.html">Customer</a>
-            <a href="restaurant.html" class="active">Restaurant</a>
-            <a href="driver.html">Driver</a>
-            <a href="admin.html">Admin</a>
-        </nav>
-    </header>
-    <div class="container">
-        <div class="card">
-            <h1>Restaurant Order Lifecycle</h1>
-            <label>Order ID:</label>
-            <input type="text" id="restOrderId" placeholder="e.g. ORD-1001">
-            <label>Update Order Status:</label>
-            <select id="restStatus">
-                <option value="PREPARING">PREPARING</option>
-                <option value="READY">READY</option>
-                <option value="CANCELLED">CANCELLED</option>
-            </select>
-            <button onclick="updateStatus()">Update Status</button>
-            <pre id="output">// Response will appear here...</pre>
-        </div>
-    </div>
-    <script>
-        async function updateStatus() {
-            const orderId = document.getElementById('restOrderId').value;
-            const status = document.getElementById('restStatus').value;
-            try {
-                const res = await fetch(`http://localhost:8086/restaurant/orders/${orderId}/status`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: status })
-                });
-                const data = await res.json();
-                document.getElementById('output').innerText = JSON.stringify(data, null, 2);
-            } catch (err) {
-                document.getElementById('output').innerText = "Error: " + err.message;
-            }
-        }
-    </script>
+<nav><a href="index.html">Customer</a><a href="restaurant.html" aria-current>Restaurant</a><a href="driver.html">Driver</a><a href="admin.html">Admin</a></nav>
+<main>
+<h1>Update an order</h1>
+<p class="hint">Tell the platform how the kitchen is doing. The restaurant must exist first.</p>
+<form onsubmit="return false">
+<div class="row"><label>Restaurant ID<input id="restaurantId" value="r1"></label><label>Order ID<input id="orderId"></label></div>
+<label>Status<select id="status"><option>PREPARING</option><option>READY</option><option>REJECTED</option></select></label>
+<div class="actions"><button onclick="setStatus()">Update order status</button><button class="alt" onclick="createDemo()">Create restaurant</button></div>
+</form>
+<pre id="out" aria-live="polite"></pre>
+</main>
+<script src="app.js"></script>
+<script>
+$('orderId').value = lastOrder();
+function setStatus() {
+  call('POST', '/api/restaurant/restaurants/' + enc('restaurantId') + '/orders/' + enc('orderId') + '/status', {status: val('status')});
+}
+function createDemo() {
+  call('POST', '/api/restaurant/restaurants', {_id: val('restaurantId'), name: 'Demo restaurant', cuisineType: 'Burgers', isOpen: true, openingTime: '08:00', closingTime: '22:00', menu: []});
+}
+</script>
 </body>
 </html>

@@ -1,53 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Customer - Place Order</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Place an order</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="index.html" class="active">Customer</a>
-            <a href="restaurant.html">Restaurant</a>
-            <a href="driver.html">Driver</a>
-            <a href="admin.html">Admin</a>
-        </nav>
-    </header>
-    <div class="container">
-        <div class="card">
-            <h1>Customer Portal</h1>
-            <label>Customer ID:</label>
-            <input type="text" id="customerId" value="CUST-101">
-            <label>Restaurant ID:</label>
-            <input type="text" id="restaurantId" value="REST-201">
-            <label>Item Name:</label>
-            <input type="text" id="itemName" value="Kapana Combo">
-            <label>Price ($):</label>
-            <input type="number" id="itemPrice" value="85.00">
-            <button onclick="createOrder()">Place Order</button>
-            <pre id="output">// Response will appear here...</pre>
-        </div>
-    </div>
-    <script>
-        async function createOrder() {
-            const payload = {
-                customerId: document.getElementById('customerId').value,
-                restaurantId: document.getElementById('restaurantId').value,
-                items: [{ name: document.getElementById('itemName').value, price: parseFloat(document.getElementById('itemPrice').value) }]
-            };
-            try {
-                const res = await fetch('http://localhost:8081/orders', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                document.getElementById('output').innerText = JSON.stringify(data, null, 2);
-            } catch (err) {
-                document.getElementById('output').innerText = "Error: " + err.message;
-            }
-        }
-    </script>
+<nav><a href="index.html" aria-current>Customer</a><a href="restaurant.html">Restaurant</a><a href="driver.html">Driver</a><a href="admin.html">Admin</a></nav>
+<main>
+<h1>Place an order</h1>
+<p class="hint">Creates an order and remembers its ID for the other pages.</p>
+<form onsubmit="return false">
+<div class="row"><label>Customer ID<input id="customerId" value="c1"></label><label>Restaurant ID<input id="restaurantId" value="r1"></label></div>
+<div class="row"><label>Item<input id="item" value="Burger"></label><label>Price<input id="price" type="number" step="0.01" value="50"></label></div>
+<div class="row"><label>Quantity<input id="qty" type="number" min="1" value="1"></label><label>Delivery address<input id="address" value="1 Main St"></label></div>
+<label>Order ID<input id="orderId" placeholder="Filled in after you place an order"></label>
+<div class="actions"><button onclick="placeOrder()">Place order</button><button class="alt" onclick="track()">Check order status</button></div>
+</form>
+<pre id="out" aria-live="polite"></pre>
+</main>
+<script src="app.js"></script>
+<script>
+$('orderId').value = lastOrder();
+async function placeOrder() {
+  const o = await call('POST', '/api/order/orders', {
+    customerId: val('customerId'), restaurantId: val('restaurantId'),
+    items: [{menuItemId: 'm1', name: val('item'), quantity: parseInt(val('qty')), unitPrice: parseFloat(val('price'))}],
+    deliveryAddress: val('address')
+  });
+  if (o && o.id) { rememberOrder(o.id); $('orderId').value = o.id; }
+}
+function track() { call('GET', '/api/order/orders/' + enc('orderId')); }
+</script>
 </body>
 </html>
