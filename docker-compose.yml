@@ -76,9 +76,10 @@ services:
       kafka-init: { condition: service_completed_successfully }
       notification-mongo: { condition: service_started }
     environment:
-      BAL_CONFIG_VAR_emailWebhook: ${EMAIL_WEBHOOK:-}
-      BAL_CONFIG_VAR_smsWebhook: ${SMS_WEBHOOK:-}
-      BAL_CONFIG_VAR_pushWebhook: ${PUSH_WEBHOOK:-}
+      BAL_CONFIG_VAR_EMAILWEBHOOK: ${EMAIL_WEBHOOK:-}
+      BAL_CONFIG_VAR_SMSWEBHOOK: ${SMS_WEBHOOK:-}
+      BAL_CONFIG_VAR_PUSHWEBHOOK: ${PUSH_WEBHOOK:-}
+      BAL_CONFIG_VAR_KAFKABOOTSTRAP: kafka:9092
     ports: ["8092:8092"]
     restart: on-failure
 
@@ -102,8 +103,8 @@ services:
     build: ./customer_service
     depends_on:
       customer-mongo: { condition: service_started }
-    #environment:
-      #BAL_CONFIG_VAR_dbUrl: mongodb://customer-mongo:27017
+    environment:
+      BAL_CONFIG_VAR_DBURL: mongodb://customer-mongo:27017
     ports: ["8084:8084"]
     restart: on-failure
 
@@ -117,8 +118,8 @@ services:
       kafka-init: { condition: service_completed_successfully }
       restaurant-mongo: { condition: service_started }
     environment:
-      BAL_CONFIG_VAR_dbUrl: mongodb://restaurant-mongo:27017
-      BAL_CONFIG_VAR_kafkaBootstrap: kafka:9092
+      BAL_CONFIG_VAR_DBURL: mongodb://restaurant-mongo:27017
+      BAL_CONFIG_VAR_KAFKABOOTSTRAP: kafka:9092
     ports: ["8086:8086"]
     restart: on-failure
 
