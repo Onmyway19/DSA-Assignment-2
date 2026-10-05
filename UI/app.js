@@ -14,7 +14,7 @@ async function call(method, url, body) {
     const text = await res.text();
     let data = null, shown = text;
     try { data = JSON.parse(text); shown = JSON.stringify(data, null, 2); } catch (e) {}
-    out.textContent = res.status + ' ' + res.statusText + '\n' + shown;
+        out.textContent = method + ' ' + url + '\n' + res.status + ' ' + res.statusText + '\n' + shown;
     out.className = res.ok ? 'ok' : 'bad';
     return data;
   } catch (e) {
