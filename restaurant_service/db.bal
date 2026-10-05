@@ -1,7 +1,11 @@
 import ballerinax/mongodb;
+
+configurable string dbUrl = "mongodb://localhost:27017";
+
+final mongodb:Client mongoClient = check new ({
+    connection: dbUrl
+});
+
 public isolated function getDatabase() returns mongodb:Database|error {
-    mongodb:Client mongoClient = check new ({
-        connection: "mongodb://localhost:27017"
-    });
     return mongoClient->getDatabase("restaurant_db");
 }
