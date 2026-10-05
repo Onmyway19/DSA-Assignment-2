@@ -80,6 +80,7 @@ services:
       BAL_CONFIG_VAR_SMSWEBHOOK: ${SMS_WEBHOOK:-}
       BAL_CONFIG_VAR_PUSHWEBHOOK: ${PUSH_WEBHOOK:-}
       BAL_CONFIG_VAR_KAFKABOOTSTRAP: kafka:9092
+      BAL_CONFIG_VAR_MONGOURL: mongodb://notification-mongo:27017
     ports: ["8092:8092"]
     restart: on-failure
 
