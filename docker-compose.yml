@@ -94,9 +94,40 @@ services:
     ports: ["8085:8085", "8095:8095"]
     restart: on-failure
 
+  customer-mongo:
+    image: mongo:7
+    volumes: ["customer-mongo-data:/data/db"]
+
+  customer-service:
+    build: ./customer_service
+    depends_on:
+      customer-mongo: { condition: service_started }
+    environment:
+      BAL_CONFIG_VAR_dbUrl: mongodb://customer-mongo:27017
+    ports: ["8084:8084"]
+    restart: on-failure
+
+  restaurant-mongo:
+    image: mongo:7
+    volumes: ["restaurant-mongo-data:/data/db"]
+
+  restaurant-service:
+    build: ./restaurant_service
+    depends_on:
+      kafka-init: { condition: service_completed_successfully }
+      restaurant-mongo: { condition: service_started }
+    environment:
+      BAL_CONFIG_VAR_dbUrl: mongodb://restaurant-mongo:27017
+      BAL_CONFIG_VAR_kafkaBootstrap: kafka:9092
+    ports: ["8086:8086"]
+    restart: on-failure
+
 volumes:
   order-mongo-data:
   payment-mongo-data:
   delivery-mongo-data:
   notification-mongo-data:
   admin-mongo-data:
+
+  customer-mongo-data:
+  restaurant-mongo-data:
