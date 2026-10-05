@@ -122,6 +122,15 @@ services:
     ports: ["8086:8086"]
     restart: on-failure
 
+  frontend:
+    image: nginx:alpine
+    container_name: food-delivery-ui
+    ports:
+      - "8080:80"
+    volumes:
+      - ./ui:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
 volumes:
   order-mongo-data:
   payment-mongo-data:

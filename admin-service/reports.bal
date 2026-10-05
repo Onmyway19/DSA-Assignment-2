@@ -46,7 +46,7 @@ function restaurantReport(string restaurantId, string? startAt, string? endAt) r
             counters.totalOrders += 1;
             string amount = payloadString(payload, "totalAmount");
             if amount != "" {
-                counters.totalRevenue += check amount.toFloat();
+                counters.totalRevenue += check float:fromString(amount);
             }
         } else if event.topic == "orders.status-changed" &&
                 payloadString(payload, "restaurantId") == restaurantId {
@@ -71,7 +71,7 @@ function restaurantReport(string restaurantId, string? startAt, string? endAt) r
                 !preparationStart.hasKey(event.orderId) {
             continue;
         }
-        float duration = check elapsedMinutes(preparationStart[event.orderId], event.occurredAt);
+        float duration = check elapsedMinutes(preparationStart.get(event.orderId), event.occurredAt);
         counters.preparationMinutes += duration;
         counters.preparationSamples += 1;
     }
@@ -113,7 +113,7 @@ function deliveryReport(string? startAt, string? endAt) returns json|error {
             assignedDriver[event.orderId] = payloadString(payload, "driverId");
             string eta = payloadString(payload, "etaMinutes");
             if eta != "" {
-                estimatedMinutes[event.orderId] = check eta.toInt();
+                estimatedMinutes[event.orderId] = check int:fromString(eta);
             }
             if isWithinRange(event.occurredAt, startAt, endAt) {
                 assignedDeliveries += 1;
@@ -127,12 +127,12 @@ function deliveryReport(string? startAt, string? endAt) returns json|error {
             map<json> payload = event.payload;
             string driverId = payloadString(payload, "driverId");
             if driverId == "" && assignedDriver.hasKey(event.orderId) {
-                driverId = assignedDriver[event.orderId];
+                driverId = assignedDriver.get(event.orderId);
             }
             if driverId == "" {
                 driverId = "UNKNOWN";
             }
-            DriverCounters counters = driverCounters.get(driverId) ?: {
+            DriverCounters counters = driverCounters.hasKey(driverId) ? driverCounters.get(driverId) : {
                 completedDeliveries: 0,
                 onTimeDeliveries: 0,
                 lateDeliveries: 0,
@@ -147,7 +147,7 @@ function deliveryReport(string? startAt, string? endAt) returns json|error {
                 if deliveredAt == "" {
                     deliveredAt = event.occurredAt;
                 }
-                float duration = check elapsedMinutes(assignedAt[event.orderId], deliveredAt);
+                float duration = check elapsedMinutes(assignedAt.get(event.orderId), deliveredAt);
                 counters.deliveryMinutes += duration;
                 counters.durationSamples += 1;
                 totalDeliveryMinutes += duration;
@@ -155,7 +155,7 @@ function deliveryReport(string? startAt, string? endAt) returns json|error {
 
                 if estimatedMinutes.hasKey(event.orderId) {
                     etaClassifiedDeliveries += 1;
-                    if duration <= estimatedMinutes[event.orderId] {
+                    if duration <= <float>estimatedMinutes.get(event.orderId) {
                         counters.onTimeDeliveries += 1;
                         onTimeDeliveries += 1;
                     } else {
@@ -178,7 +178,7 @@ function deliveryReport(string? startAt, string? endAt) returns json|error {
     }
     json[] perDriver = [];
     foreach string driverId in driverCounters.keys() {
-        DriverCounters counters = driverCounters[driverId];
+        DriverCounters counters = driverCounters.get(driverId);
         float averageMinutes = 0.0;
         if counters.durationSamples > 0 {
             averageMinutes = counters.deliveryMinutes / counters.durationSamples;
@@ -205,22 +205,22 @@ function deliveryReport(string? startAt, string? endAt) returns json|error {
 }
 
 function validateRange(string? startAt, string? endAt) returns error? {
-    time:Utc? start = ();
-    time:Utc? end = ();
+    time:Utc? rangeStart = ();
+    time:Utc? rangeEnd = ();
     if startAt is string {
         if !startAt.endsWith("Z") {
             return error("startAt must use a UTC timestamp ending in Z");
         }
-        start = check time:utcFromString(startAt);
+        rangeStart = check time:utcFromString(startAt);
     }
     if endAt is string {
         if !endAt.endsWith("Z") {
             return error("endAt must use a UTC timestamp ending in Z");
         }
-        end = check time:utcFromString(endAt);
+        rangeEnd = check time:utcFromString(endAt);
     }
-    if start is time:Utc && end is time:Utc &&
-            time:utcDiffSeconds(start, end) > 0.0 {
+    if rangeStart is time:Utc && rangeEnd is time:Utc &&
+            time:utcDiffSeconds(rangeStart, rangeEnd) > 0d {
         return error("startAt must not be later than endAt");
     }
 }

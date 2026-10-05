@@ -165,8 +165,8 @@ function dispatchNotification(NotificationEvent event, string recipientType, str
             recipientType = recipientType, recipientId = recipientId, channel = channel,
             eventId = event.eventId);
     } else {
-        http:Client client = check new (endpoint);
-        http:Response response = check client->post("/", {
+        http:Client webhookClient = check new (endpoint);
+        http:Response response = check webhookClient->post("/", {
             deliveryId,
             eventId: event.eventId,
             orderId: event.orderId,
@@ -181,7 +181,7 @@ function dispatchNotification(NotificationEvent event, string recipientType, str
         resultStatus = "SENT";
     }
 
-    check collection->updateOne({id: deliveryId}, {
+    _ = check collection->updateOne({id: deliveryId}, {
         set: {status: resultStatus, updatedAt: notificationTime()}
     });
     log:printInfo("Notification processed", recipientType = recipientType,
@@ -190,9 +190,15 @@ function dispatchNotification(NotificationEvent event, string recipientType, str
 
 function channelWebhook(string channel) returns string {
     match channel {
-        "EMAIL" => return emailWebhook;
-        "SMS" => return smsWebhook;
-        "PUSH" => return pushWebhook;
+        "EMAIL" => {
+            return emailWebhook;
+        }
+        "SMS" => {
+            return smsWebhook;
+        }
+        "PUSH" => {
+            return pushWebhook;
+        }
     }
     return "";
 }
